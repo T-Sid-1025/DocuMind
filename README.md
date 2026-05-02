@@ -1,4 +1,4 @@
-```markdown
+
 # 🧠 DocuMind — AI PDF Assistant
 
 > Ask anything from any document. Powered by RAG + LangGraph + Groq.
@@ -71,4 +71,3 @@ DocuMind/
 **Siddhant Tagare** — Agentic AI Intern @ Innomatics Research Labs, Pune
 
 [![GitHub](https://img.shields.io/badge/GitHub-T--Sid--1025-black?logo=github)](https://github.com/T-Sid-1025)
-```
