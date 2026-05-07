@@ -1,20 +1,36 @@
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import (
+    PyPDFLoader,
+    Docx2txtLoader,
+    UnstructuredExcelLoader
+)
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from backend.config import embedding_model, CHROMA_PATH
 import os
 
 
-def process_pdf(file_path: str) -> str:
-    filename = os.path.basename(file_path)
+def process_file(file_path: str) -> str:
+    filename  = os.path.basename(file_path)
+    extension = filename.split(".")[-1].lower()
+
+    # ── Pick the right loader ─────────────────────────────────────────────────
+    if extension == "pdf":
+        loader = PyPDFLoader(file_path)
+
+    elif extension in ["docx", "doc"]:
+        loader = Docx2txtLoader(file_path)
+
+    elif extension in ["xlsx", "xls"]:
+        loader = UnstructuredExcelLoader(file_path, mode="elements")
+
+    else:
+        print(f"[ingestion] Unsupported file type: {extension}")
+        return f"Unsupported file type: {extension}"
 
     # ── Load ──────────────────────────────────────────────────────────────────
-    loader = PyPDFLoader(file_path)
     documents = loader.load()
 
     # ── Split ─────────────────────────────────────────────────────────────────
-    # Larger chunks (800) preserve more context per retrieval hit.
-    # Overlap (150) ensures sentences at boundaries aren't lost.
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=150,
@@ -34,5 +50,5 @@ def process_pdf(file_path: str) -> str:
     vectordb.add_documents(chunks)
     vectordb.persist()
 
-    print(f"[ingestion] {filename} → {len(chunks)} chunks stored.")
-    return "PDF processed successfully"
+    print(f"[ingestion] {filename} ({extension}) → {len(chunks)} chunks stored.")
+    return "File processed successfully"

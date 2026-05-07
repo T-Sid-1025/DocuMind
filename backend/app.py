@@ -3,7 +3,7 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
 import shutil, os
 
-from backend.ingestion import process_pdf
+from backend.ingestion import process_file
 from backend.graph import build_graph
 
 app = FastAPI()
@@ -28,7 +28,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     file_path = f"data/{file.filename}"
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    process_pdf(file_path)
+    process_file(file_path)
     if file.filename not in uploaded_files:
         uploaded_files.append(file.filename)
     return {"message": "PDF uploaded successfully", "files": uploaded_files}
